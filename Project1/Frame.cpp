@@ -6,17 +6,16 @@
 #include "General.h"
 
 //Конструктор изображения с заданной шириной и высотой
-Frame::Frame(unsigned w, unsigned h) {
+Frame::Frame(unsigned w, unsigned h, Color back) {
 	width = w;
 	height = h;
 
 	data = new Color[w * h];
 	mat = new Color * [h];
-	Color white(255, 255, 255, 0);
 	for (int i = 0; i < h; i++) {
 		mat[i] = data + i * w;
 		for (int j = 0; j < w; j++) {
-			mat[i][j] = white;
+			mat[i][j] = back;
 		}
 	}
 }
@@ -153,6 +152,10 @@ void Frame::FillTriangle(double x1, double y1, double x2, double y2, double x3, 
 	int Y2 = (int)(y2 + 0.5);
 	int Y3 = (int)(y3 + 0.5);
 
+	if (Y1 < 0) Y1 = 0; if (Y1 > height) Y1 = height;
+	if (Y2 < 0) Y2 = 0; if (Y2 > height) Y2 = height;
+	if (Y3 < 0) Y3 = 0; if (Y3 > height) Y3 = height;
+
 	//Получаем дробные координаты x для точек, принадлежащих прямым, составляющим верхнюю часть треугольника, и лежащим ровно на середине пикселей центрального ряда
 	double xl = (Y2 + 0.5 - y2) * (x3 - x2) / (y3 - y2) + x2;
 	double xr = (Y2 + 0.5 - y1) * (x3 - x1) / (y3 - y1) + x1;
@@ -217,6 +220,10 @@ void Frame::FillCircle(double xc, double yc, double r, Shader& interpolator) {
 	//Получаем целые номера рядов, на которых находится самая верхняя и самая нижняя точка круга
 	int Y1 = (int)(yc - r + 0.5);
 	int Y2 = (int)(yc + r + 0.5);
+
+	if (Y1 < 0) Y1 = 0; if (Y1 > height) Y1 = height;
+	if (Y2 < 0) Y2 = 0; if (Y2 > height) Y2 = height;
+
 	//Получаем вспомогательное значение для вычисления координат x левых и крайних пикселей в ряду
 	double pre_x = r * r - (Y1 + 0.5 - yc) * (Y1 + 0.5 - yc);
 	//Перебираем координаты y центров рядов пикселей всего круга

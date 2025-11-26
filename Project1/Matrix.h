@@ -13,9 +13,9 @@ class Matrix
 public:
 	Matrix(int nRows, int nCols);
 	friend const Matrix operator* (const Matrix& mat1, const Matrix& mat2);
+	Matrix& operator=(const Matrix& mat);
 	double* operator[] (const int row);
 	const double* operator[](const int row) const;
-	Matrix copyMatrix();
 	~Matrix();
 };
 
@@ -66,6 +66,18 @@ const Matrix operator* (const Matrix& mat1, const Matrix& mat2)
 	return multed;
 }
 
+Matrix& Matrix::operator= (const Matrix& mat)
+{
+	this->n = mat.n;
+	this->m = mat.m;
+	for (int row_ind = 0; row_ind < n; row_ind++) {
+		for (int col_ind = 0; col_ind < m; col_ind++) {
+			(*this)[row_ind][col_ind] = mat[row_ind][col_ind];
+		}
+	}
+	return *this;
+}
+
 double* Matrix::operator[](const int row)
 {
 	return ptr[row];
@@ -74,16 +86,6 @@ double* Matrix::operator[](const int row)
 const double* Matrix::operator[](const int row) const
 {
 	return ptr[row];
-}
-
-Matrix Matrix::copyMatrix() {
-	Matrix new_m(n, m);
-	for (int row_ind = 0; row_ind < n; row_ind++) {
-		for (int col_ind = 0; col_ind < m; col_ind++) {
-			new_m[row_ind][col_ind] = (*this)[row_ind][col_ind];
-		}
-	}
-	return new_m;
 }
 
 Matrix::~Matrix() {
@@ -97,7 +99,7 @@ Matrix::~Matrix() {
 }
 
 
-Point::Point(double x, double y) : Matrix(3, 1) {
+Point::Point(double x=0, double y=0) : Matrix(3, 1) {
 	(*this)[0][0] = x;
 	(*this)[1][0] = y;
 	(*this)[2][0] = 1;

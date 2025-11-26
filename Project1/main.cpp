@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInst, LPSTR lpszArgs,
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int pixelSize = 1; // Размер "большого" пикселя
-    //static MyComplexFigure painter(0, 0, 0, 0);
-    static LetterC painter(10, 0, 0, 0);
+    static LetterC painter;
+    static bool need_to_rearrange = true;
 
     switch (message) {
         // Обработка сообщения на создание окна
@@ -103,12 +103,15 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
             int H = (height - 22) / ratio; // Отнимем высоту StatusBar'а
 
             //Задание параметров изображения и фигуры, рисование фигуры на изображении
-            Frame frame(W, H);
+            Frame frame(W, H, Color(22, 22, 29));
 
             // Вычислим время, которое нужно затратить для рисования одного кадра
             char repaint_time[500];
             DWORD t1 = GetTickCount();
-            painter = LetterC((double)(W > H ? H : W) * 7 / 16, (double)W / 2 + 0.5, (double)H / 2 + 0.5, 0);
+            if (need_to_rearrange) {
+                painter.Rearrange((double)(W > H ? H : W) * 7 / 16, (double)W / 2 + 0.5, (double)H / 2 + 0.5, 0);
+                need_to_rearrange = false;
+            }
 
             painter.drawIt(&frame);            
             sprintf_s(repaint_time, "Время перерисовки окна: %d миллисекунд", GetTickCount() - t1);
@@ -172,8 +175,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
             // Удаление временного контекста
             DeleteDC(srcHdc);
-
-            char str[256];
         }
         break;
 
@@ -227,7 +228,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
         {
             // Подгоняем размеры StatusBar под размер окна
             SendMessageA(hWndStatusBar, WM_SIZE, 0, 0);
-
+            need_to_rearrange = true;
             // Перерисовать окно
             InvalidateRect(hWnd, NULL, false);
         }
@@ -236,7 +237,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
         case WM_TIMER:
             // При срабатывании таймера увеличим угол поворота
         {
-            //painter.rotateTo(0.025);
+            painter.rotateTo(0.025);
+            painter.changeRad(0.95, 1);
             // Перерисовать окно
             InvalidateRect(hWnd, NULL, false);
         }

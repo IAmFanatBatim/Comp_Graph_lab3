@@ -11,7 +11,7 @@ class Frame
 	Color** mat;		//Массив указателей на горизонтальные ряды пикселей
 	Color* data;		//Массив, хранящий информацию о каждом пикселе изображения
 public:
-	Frame(unsigned w, unsigned h);
+	Frame(unsigned w, unsigned h, Color back);
 	Color GetPixel(int x, int y);
 	void SetPixel(int x, int y, Color swatch);
 	void OverlayColor(int x, int y, Color swatch);
